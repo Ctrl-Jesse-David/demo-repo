@@ -1,44 +1,85 @@
-import itertools
 
-def is_valid_word(word, valid_words):
-    return word in valid_words
+import os
+import random
 
-def get_possible_words(letters, valid_words):
-    possible_words = set()
-    for i in range(3, len(letters) + 1):  # Words of length 3 or more
-        for combo in itertools.permutations(letters, i):
-            word = "".join(combo)
-            if word in valid_words:
-                possible_words.add(word)
-    return possible_words
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-def wordscapes_game():
-    print("Welcome to Wordscapes!")
-    letters = "tree"
-    valid_words = {"tree", "tee", "ere", "ret"}  # Replace with a larger word set if needed
+def display_grid(grid):
+    clear_screen()
+    print("\nWordscapes - Terminal Edition\n")
+    for row in grid:
+        print(" ".join(row))
+    print("\n")
+
+def shuffle_letters(letters):
+    return "".join(random.sample(letters, len(letters)))
+
+def generate_grid():
+    return [
+        ["-", "-", "-", "x", "-"],
+        ["-", "-", "-", "x", "-"],
+        ["-", "x", "x", "x", "x"],
+        ["-", "x", "-", "-", "-"],
+        ["-", "x", "-", "-", "-"],
+        ["x", "x", "x", "x", "-"],
+        ["x", "-", "-", "-", "-"],
+        ["x", "-", "-", "-", "-"],
+        ["x", "-", "-", "-", "-"]
+    ]
+
+def update_grid(grid, word):
+    positions = {
+        "TEAM": [(2, 1), (2, 2), (2, 3), (2, 4)],
+        "MEAT": [(5, 0), (5, 1), (5, 2), (5, 3)],
+        "MATE": [(5, 0), (6, 0), (7, 0), (8, 0)],
+        "TEA": [(0, 3), (1, 3), (2, 3)],
+        "TAME": [(2, 1), (3, 1), (4, 1), (5, 1)]
+    }
+    
+    if word in positions:
+        for idx, (row, col) in enumerate(positions[word]):
+            grid[row][col] = word[idx]
+        return True
+    return False
+
+def is_valid_guess(guess, level_letters):
+    return all(guess.count(letter) <= level_letters.count(letter) for letter in guess)
+
+def wordscapes():
+    level_letters = "TEAM"
+    valid_words = {"TEAM", "MEAT", "MATE", "TEA", "TAME"}
     found_words = set()
-    possible_words = get_possible_words(letters, valid_words)
+    grid = generate_grid()
     
-    print(f"Your letters: {', '.join(letters)}")
-    print("Find as many words as you can! (Type 'exit' to quit)")
-    
-    while found_words != possible_words:
-        user_input = input("Enter a word: ").strip().lower()
+    while found_words != valid_words:
+        display_grid(grid)
+        print(f"Available letters: {level_letters}")
+        print("Commands: [shuffle] to shuffle letters, [exit] to quit\n")
         
-        if user_input == "exit":
-            print("Game over! Here were the possible words:", possible_words)
+        guess = input("Enter a word: ").upper()
+        
+        if guess == "SHUFFLE":
+            level_letters = shuffle_letters(level_letters)
+            continue
+        elif guess == "EXIT":
             break
-        
-        if user_input in found_words:
-            print("You already found that word!")
-        elif is_valid_word(user_input, valid_words):
-            found_words.add(user_input)
-            print(f"Good job! {len(possible_words) - len(found_words)} words left.")
+        elif guess in valid_words:
+            if guess in found_words:
+                print("Word already found!")
+            elif is_valid_guess(guess, level_letters):
+                found_words.add(guess)
+                update_grid(grid, guess)
+                print("Correct!")
+            else:
+                print("Invalid word. Check your letters!")
         else:
-            print("Invalid word. Try again!")
+            print("Word not in list.")
+        
+        input("Press Enter to continue...")
     
-    if found_words == possible_words:
-        print("Congratulations! You found all words!")
+    display_grid(grid)
+    print("Congratulations! You completed the level.")
 
 if __name__ == "__main__":
-    wordscapes_game()
+    wordscapes()
