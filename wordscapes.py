@@ -2,6 +2,10 @@
 import os
 import random
 
+'''
+there should be an interface
+'''
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -28,6 +32,10 @@ def generate_grid():
         ["x", "-", "-", "-", "-"]
     ]
 
+# shpuld make a generate grid that fetches grids, then returns the grid,
+# instead of it being constant, it should be reusable
+# and grid should be imported from another file
+
 def update_grid(grid, word):
     positions = {
         "TEAM": [(2, 1), (2, 2), (2, 3), (2, 4)],
@@ -45,6 +53,10 @@ def update_grid(grid, word):
 
 def is_valid_guess(guess, level_letters):
     return all(guess.count(letter) <= level_letters.count(letter) for letter in guess)
+
+# Same goes with this function UpdateGrid
+# It should allow to get positions
+# which are dictionaries
 
 def wordscapes():
     level_letters = "TEAM"
@@ -77,6 +89,9 @@ def wordscapes():
             print("Word not in list.")
         
         input("Press Enter to continue...")
+        '''
+        should be timed
+        '''
     
     display_grid(grid)
     print("Congratulations! You completed the level.")
